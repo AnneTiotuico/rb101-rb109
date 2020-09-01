@@ -1,8 +1,15 @@
 require 'yaml'
 MESSAGES = YAML.load_file('calculator_messages.yml')
 
+LANGUAGE = 'en'
+
 # methods
-def prompt(message)
+def messages(message, lang='en')
+  MESSAGES[lang][message]
+end
+
+def prompt(key)
+  message = messages(key, LANGUAGE)
   puts("=> #{message}")
 end
 
@@ -11,70 +18,62 @@ def number?(num)
 end
 
 def operation_to_message(op)
-  word = case op
+  operation = case op
          when '1'
-           'Adding'
+          messages('adding', LANGUAGE)
          when '2'
-           'Subtracting'
+          messages('subtracting', LANGUAGE)
          when '3'
-           'Multiplying'
+          messages('multiplying', LANGUAGE)
          when '4'
-           'Dividing'
+          messages('dividing', LANGUAGE)
          end
-  word
+  operation
 end
 
 # main program
 
-prompt MESSAGES['welcome']
+prompt 'welcome'
 
 name = ''
 loop do
   name = gets.chomp
 
   if name.empty?
-    prompt MESSAGES['valid_name']
+    prompt 'valid_name'
   else
     break
   end
 end
 
-prompt("Hi #{name}!")
+puts format(messages('greeting', LANGUAGE), name: name)
 
 loop do # main loop
   number1 = ''
   loop do
-    prompt MESSAGES['first_number']
+    prompt 'first_number'
     number1 = gets.chomp
 
     if number?(number1)
       break
     else
-      prompt MESSAGES['not_valid_number']
+      prompt 'not_valid_number'
     end
   end
 
   number2 = ''
   loop do
-    prompt MESSAGES['second_number']
+    prompt 'second_number'
     number2 = gets.chomp
 
     if number?(number2)
       break
     else
-      prompt MESSAGES['not_valid_number']
+      prompt 'not_valid_number'
     end
   end
 
-  operator_prompt = <<-MSG
-  What operation would you like for perform?
-      1) add
-      2) subtract
-      3) multiply
-      4) divide
-  MSG
-
-  prompt operator_prompt
+  prompt 'operator_prompt'
   operator = ''
   loop do
     operator = gets.chomp
@@ -82,11 +81,11 @@ loop do # main loop
     if %w(1 2 3 4).include?(operator)
       break
     else
-      prompt MESSAGES['valid_operator']
+      prompt 'valid_operator'
     end
   end
 
-  prompt "#{operation_to_message(operator)} the two numbers..."
+  puts format(messages('operation', LANGUAGE), operation: operation_to_message(operator))
 
   result = case operator
            when '1'
@@ -99,11 +98,11 @@ loop do # main loop
              number1.to_f / number2.to_f
            end
 
-  prompt "The result is #{result}"
+  puts format(messages('result', LANGUAGE), result: result)
 
-  prompt MESSAGES['another_calculation']
+  prompt 'another_calculation'
   answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
+  break unless answer.downcase == 'y'
 end
 
-prompt MESSAGES['goodbye']
+prompt 'goodbye'
