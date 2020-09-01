@@ -84,7 +84,9 @@ loop do # main loop
   loop do
     operator = gets.chomp
 
-    if %w(1 2 3 4).include?(operator)
+    if operator == '4' && number2 == '0'
+      prompt 'zero_division_error'
+    elsif %w(1 2 3 4).include?(operator)
       break
     else
       prompt 'valid_operator'
