@@ -13,6 +13,20 @@ def prompt(key)
   puts("=> #{message}")
 end
 
+def get_name()
+  name = ''
+  loop do
+  name = gets.chomp
+
+    unless /^[[:alpha:]]+$/.match(name)
+      prompt 'invalid_name'
+    else
+      break
+    end
+  end
+  name
+end
+
 def number?(num)
   num.to_i.to_s == num || num.to_f.to_s == num
 end
@@ -35,16 +49,8 @@ end
 
 prompt 'welcome'
 
-name = ''
-loop do
-  name = gets.chomp
+name = get_name()
 
-  if name.empty?
-    prompt 'valid_name'
-  else
-    break
-  end
-end
 
 puts format(messages('greeting', LANGUAGE), name: name)
 
@@ -101,8 +107,16 @@ loop do # main loop
   puts format(messages('result', LANGUAGE), result: result)
 
   prompt 'another_calculation'
-  answer = gets.chomp
-  break unless answer.downcase == 'y'
+  answer = ''
+  loop do
+    answer = gets.chomp
+    if answer.downcase == 'y' || answer.downcase == 'n'
+      break
+    else
+      prompt 'invalid_continue'
+    end
+  end
+  break if answer.downcase == 'n'
 end
 
 prompt 'goodbye'

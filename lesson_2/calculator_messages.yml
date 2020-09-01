@@ -1,6 +1,6 @@
 en:
   welcome: "Welcome to Calculator! Enter your name:"
-  valid_name: "Make sure to use a valid name."
+  invalid_name: "Make sure to use a valid name."
   greeting: "Hi %{name}!"
   first_number: "What's the first number?"
   second_number: "What's the second number?"
@@ -18,12 +18,13 @@ en:
   dividing: "Dividing"
   operation: "%{operation} the two numbers..."
   result: "The result is %{result}."
-  another_calculation: "Do you want to perform another calculation? ('Y' to calculate again)"
+  another_calculation: "Do you want to perform another calculation? ('Y' to calculate again / 'N' to quit.)"
+  invalid_continue: "Invalid input. Please choose 'Y' or 'N'."
   goodbye: "Thank you for using the calculator. Good bye!"
 
 es:
   welcome: "¡Bienvenido a la calculadora! Entre su nombre:"
-  valid_name: "Asegúrese de entrar un nombre válido."
+  invalid_name: "Asegúrese de entrar un nombre válido."
   greeting: "¡Hola %{name}!"
   first_number: "¿Cuál es el primer número?"
   second_number: "¿Cuál es el segundo número?"
@@ -46,7 +47,7 @@ es:
 
 fil:
   welcome: "Maligayang pagdating sa Calculator! Ipasok ang iyong pangalan:"
-  valid_name: "Tiyaking maglagay ng wastong pangalan."
+  invalid_name: "Tiyaking maglagay ng wastong pangalan."
   greeting: "Kamusta %{name}!"
   first_number: "Ano ang unang numero?"
   second_number: "Ano ang ikalawang numero?"
