@@ -51,7 +51,6 @@ prompt 'welcome'
 
 name = get_name()
 
-
 puts format(messages('greeting', LANGUAGE), name: name)
 
 loop do # main loop
@@ -119,6 +118,7 @@ loop do # main loop
     end
   end
   break if answer.downcase == 'n'
+  system("clear") || system("cls")
 end
 
 prompt 'goodbye'
