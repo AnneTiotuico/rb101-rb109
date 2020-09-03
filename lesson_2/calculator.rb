@@ -56,6 +56,7 @@ end
 
 def get_operator(lang, number2)
   operator = ''
+  prompt 'operator_prompt', lang
   loop do
     operator = gets.chomp
     if operator == '4' && number2 == '0'
@@ -83,23 +84,32 @@ def operation_to_message(op, lang)
   operation
 end
 
+def continue(lang)
+  prompt 'another_calculation', lang
+  answer = ''
+  loop do
+    answer = gets.chomp
+    if answer.downcase == 'y' || answer.downcase == 'n'
+      break
+    else
+      prompt 'invalid_continue', lang
+    end
+  end
+  answer
+end
+
 # ------------ main program ------------
 system("clear") || system("cls")
 
 lang = get_lang()
-
 prompt 'welcome', lang
-
 name = get_name(lang)
-
 puts format(messages('greeting', lang), name: name)
 
 #  ------------ main loop ------------
 loop do
   number1 = get_num('first_number', lang)
   number2 = get_num('second_number', lang)
-
-  prompt 'operator_prompt', lang
   operator = get_operator(lang, number2)
 
   puts format(messages('operation', lang),
@@ -120,16 +130,7 @@ loop do
 
   puts format(messages('result', lang), result: result)
 
-  prompt 'another_calculation', lang
-  answer = ''
-  loop do
-    answer = gets.chomp
-    if answer.downcase == 'y' || answer.downcase == 'n'
-      break
-    else
-      prompt 'invalid_continue', lang
-    end
-  end
+  answer = continue(lang)
   break if answer.downcase == 'n'
   system("clear") || system("cls")
   prompt 'again', lang
