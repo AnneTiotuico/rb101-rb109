@@ -15,18 +15,23 @@ def get_lang
   lang_choice = ''
   loop do
     puts messages('language', 'en')
-    lang_choice = gets.chomp
+    lang_choice = gets.chomp.downcase
     break if %w(en es fil).include?(lang_choice)
   end
   lang_choice
+end
+
+def valid_name?(name)
+  if /^[[:alpha:]]+$/.match(name) || /^[[:alpha:]]+ [[:alpha:]]+$/.match(name)
+    true
+  end
 end
 
 def get_name(lang)
   name = ''
   loop do
     name = gets.chomp
-
-    if /^[[:alpha:]]+$/.match(name) || /^[[:alpha:]]+ [[:alpha:]]+$/.match(name)
+    if valid_name?(name)
       break
     else
       prompt 'invalid_name', lang
@@ -84,6 +89,20 @@ def operation_to_message(op, lang)
   operation
 end
 
+def calculate_result(number1, number2, operator)
+  result = case operator
+           when '1'
+             number1.to_f + number2.to_f
+           when '2'
+             number1.to_f - number2.to_f
+           when '3'
+             number1.to_f * number2.to_f
+           when '4'
+             number1.to_f / number2.to_f
+           end
+  result
+end
+
 def continue(lang)
   prompt 'another_calculation', lang
   answer = ''
@@ -98,8 +117,12 @@ def continue(lang)
   answer
 end
 
+def clear_screen
+  system("clear") || system("cls")
+end
+
 # ------------ main program ------------
-system("clear") || system("cls")
+clear_screen()
 
 lang = get_lang()
 prompt 'welcome', lang
@@ -117,22 +140,13 @@ loop do
               number1: number1,
               number2: number2)
 
-  result = case operator
-           when '1'
-             number1.to_f + number2.to_f
-           when '2'
-             number1.to_f - number2.to_f
-           when '3'
-             number1.to_f * number2.to_f
-           when '4'
-             number1.to_f / number2.to_f
-           end
+  result = calculate_result(number1, number2, operator, lang)
 
   puts format(messages('result', lang), result: result)
 
   answer = continue(lang)
   break if answer.downcase == 'n'
-  system("clear") || system("cls")
+  clear_screen()
   prompt 'again', lang
 end
 
