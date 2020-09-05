@@ -20,7 +20,7 @@ def format_decimals(number)
   format('%.2f', number)
 end
 
-def get_loan_amount()
+def get_loan_amount
   loan_amount = ''
   loop do
     prompt "loan_amount"
@@ -34,7 +34,7 @@ def get_loan_amount()
   loan_amount.to_f
 end
 
-def get_apr()
+def get_apr
   interest_rate = ''
   loop do
     prompt "interest_rate"
@@ -48,12 +48,12 @@ def get_apr()
   interest_rate.to_f
 end
 
-def get_loan_duration()
+def get_loan_duration
   loan_duration_years = ''
   loop do
     prompt "loan_duration_years"
     loan_duration_years = gets.chomp
-    if loan_duration_years < '0' || loan_duration_years.empty?
+    if loan_duration_years < '0' && loan_duration_years.empty?
       prompt "invalid_duration"
     else
       break
@@ -71,16 +71,30 @@ def calculate_monthly_interest_rate(annual_interest_rate)
 end
 
 def calculate_monthly_payment(loan_amount, monthly_interest_rate, months)
-  monthly_payment = loan_amount * (monthly_interest_rate / (1 - (1 + monthly_interest_rate)**(-months)))
+  monthly_payment = loan_amount * (monthly_interest_rate /
+                                  (1 - (1 + monthly_interest_rate)**(-months)))
   monthly_payment = format_decimals(monthly_payment)
+  monthly_payment.to_f
 end
 
-def calculate_total_interest(loan_amount, annual_interest_rate, loan_duration_years)
-  interest_total = loan_amount * annual_interest_rate * loan_duration_years
-  interest_total = format_decimals(interest_total)
+def calculate_total_interest(loan_amount, monthly_interest_rate,
+                             months, monthly_payment)
+  outstanding = loan_amount
+  total_interest = 0
+  while months >= 0
+    interest = (outstanding * monthly_interest_rate).round(2)
+    outstanding -= (monthly_payment - interest)
+    total_interest += interest
+    months -= 1
+  end
+  format_decimals(total_interest).to_f
 end
 
-def continue()
+def calculate_total_payment(loan_amount, total_interest)
+  loan_amount + total_interest
+end
+
+def continue
   answer = ''
   loop do
     answer = gets.chomp
@@ -102,20 +116,23 @@ loop do
   prompt "welcome"
   # get user loan info
   loan_amount = get_loan_amount()
-
   apr = get_apr()
-
   loan_duration_years = get_loan_duration()
 
-  #calculations
+  # calculations
   annual_interest_rate = calculate_annual_interest_rate(apr)
   monthly_interest_rate = calculate_monthly_interest_rate(annual_interest_rate)
   months = loan_duration_years.to_i * 12
-  monthly_payment = calculate_monthly_payment(loan_amount, monthly_interest_rate, months)
-  total_interest = calculate_total_interest(loan_amount, annual_interest_rate, loan_duration_years)
+  monthly_payment = calculate_monthly_payment(loan_amount,
+                                              monthly_interest_rate, months)
+  total_interest = calculate_total_interest(loan_amount, monthly_interest_rate,
+                                            months, monthly_payment)
+  total_payment = calculate_total_payment(loan_amount, total_interest)
 
-
-  puts format(messages("monthly_payment"), monthly_payment: monthly_payment,
+  puts format(messages("monthly_payment"),
+              monthly_payment: monthly_payment,
+              months: months,
+              total_payment: total_payment,
               total_interest: total_interest)
 
   prompt "continue"

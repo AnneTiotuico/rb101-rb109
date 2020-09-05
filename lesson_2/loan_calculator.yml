@@ -9,6 +9,7 @@ en:
   invalid_duration: "Please enter a valid duration."
   monthly_payment: |
                 Your monthly payment is: $%{monthly_payment}
+                Total of %{months} Payments: $%{total_payment}
                 Your total interest is: $%{total_interest}
   continue: "Do you want to do another calculation? (y/n)"
   invalid_continue: "Invalid response. Please enter 'y' or 'n'."
