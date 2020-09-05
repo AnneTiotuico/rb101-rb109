@@ -1,0 +1,15 @@
+en:
+  welcome: "Welcome to the loan calculator! Enter your loan information, and we'll tell you how long it will take to pay off."
+  loan_amount: "What is your loan amount?"
+  interest_rate: |
+                  What is the interest rate on your loan?
+                    (Ex: If 5%, enter 5 or if 2.5% enter 2.5)
+  invalid_number: "Please make sure to enter a valid number."
+  loan_duration_years: "What is your loan duration? (in years)"
+  invalid_duration: "Please enter a valid duration."
+  monthly_payment: |
+                Your monthly payment is: $%{monthly_payment}
+                Your total interest is: $%{total_interest}
+  continue: "Do you want to do another calculation? (y/n)"
+  invalid_continue: "Invalid response. Please enter 'y' or 'n'."
+  goodbye: "Thanks for using the Loan Calculator!"
