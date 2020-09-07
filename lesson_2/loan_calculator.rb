@@ -87,7 +87,6 @@ def calculate_total_interest(loan_amount, monthly_interest_rate,
   total_interest = 0
   while loan_duration_months >= 0
     interest = (outstanding * monthly_interest_rate).round(2)
-    puts interest
     outstanding -= (monthly_payment - interest)
     total_interest += interest
     loan_duration_months -= 1
@@ -103,18 +102,28 @@ def continue
   answer = ''
   loop do
     answer = gets.chomp
-    if answer.downcase == 'y' || answer.downcase == 'n'
-      break
-    else
-      prompt "invalid_continue"
-    end
+    break if ['y', 'n'].include?(answer.downcase)
+    prompt "invalid_continue"
   end
   answer
+end
+
+def another_calculation?
+  prompt "continue"
+  answer = continue()
+  if answer.downcase == 'n'
+    false
+  else
+    clear_screen()
+    prompt "again"
+    true
+  end
 end
 
 def clear_screen
   system("clear") || system("cls")
 end
+
 # main program
 clear_screen()
 prompt "welcome"
@@ -146,11 +155,7 @@ loop do
               total_payment: total_payment,
               total_interest: total_interest)
 
-  prompt "continue"
-  answer = continue()
-  break if answer.downcase == 'n'
-  clear_screen()
-  prompt "again"
+  break unless another_calculation?
 end
 
 prompt "goodbye"
