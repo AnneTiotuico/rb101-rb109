@@ -1,15 +1,23 @@
 en:
-  welcome: "Welcome to Rock Paper Scissors Spock! First to 5 points wins. Let's play!"
+  welcome: |
+        Welcome to Rock Paper Scissors Lizard Spock! First to 5 points wins. Let's play!
+           (Enter: 'rules' if you need a reminder while playing)
+  rules: |
+        RULES:
+            Scissors cuts Paper covers Rock crushes Lizard poisons
+            Spock smashes Scissors decapitates Lizard eats paper
+            disproves Spock vaporizes Rock crushes Scissors.
   choices: "Choose one: rock (r), paper (p), scissors (sc), lizard (l) or spock (sp)."
   invalid_choice: "That's not a valid choice."
   player_choice: "=> You chose: %{choice}."
   computer_choice: "=> Computer chose: %{computer_choice}."
-  player_won: "You won this round!"
-  computer_won: "Computer won this round!"
+  player_won: "YOU won this round!"
+  computer_won: "COMPUTER won this round!"
   tie: "It's a tie!"
   display_score: |
-                  => ~~~~SCORE BOARD~~~~
-                  => You: %{player_score} | Computer: %{computer_score}
+                  =>  ~~~~~~SCORE BOARD~~~~~~
+                  => | You: %{player_score} | Computer: %{computer_score} |
+                  =>  ~~~~~~~~~~~~~~~~~~~~~~~
   player_grand_winner: "You are the grand winner!"
   computer_grand_winner: "The computer is the grand winner!"
   invalid_continue: "Invalid response. Please enter 'y' or 'n'."

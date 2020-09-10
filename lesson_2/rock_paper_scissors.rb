@@ -8,19 +8,20 @@ ABBREVIATIONS = { "r" => "rock",
                   "l" => "lizard",
                   "sp" => "spock" }
 
-VALID_CHOICES = { "rock" => ['scissors', 'lizard'],
-                  "paper" => ['rock', 'spock'],
-                  "scissors" => ['paper', 'lizard'],
-                  "lizard" => ['paper', 'spock'],
-                  "spock" => ['rock', 'scissors'],
-                  "r" => ['scissors', 'lizard'],
-                  "p" => ['rock', 'spock'],
-                  "sc" => ['paper', 'lizard'],
-                  "l" => ['paper', 'spock'],
-                  "sp" => ['rock', 'scissors'] }
+VALID_CHOICES = { "rock" => ['scissors', 'lizard', 'sc', 'l'],
+                  "paper" => ['rock', 'spock', 'r', 'sp'],
+                  "scissors" => ['paper', 'lizard', 'p', 'l'],
+                  "lizard" => ['paper', 'spock', 'p', 'sp'],
+                  "spock" => ['rock', 'scissors', 'r', 'sc'],
+                  "r" => ['scissors', 'lizard', 'sc', 'l'],
+                  "p" => ['rock', 'spock', 'r', 'sp'],
+                  "sc" => ['paper', 'lizard', 'p', 'l'],
+                  "l" => ['paper', 'spock', 'p', 'sp'],
+                  "sp" => ['rock', 'scissors', 'r', 'sc'] }
 
 scores = { "player" => 0, "computer" => 0 }
 
+# methods
 def messages(message, lang = 'en')
   MESSAGES[lang][message]
 end
@@ -37,6 +38,9 @@ def valid_choice
     choice = gets.chomp.downcase
     if VALID_CHOICES.keys.include?(choice)
       break
+    elsif choice == 'rules'
+      clear_screen()
+      prompt "rules"
     else
       prompt "invalid_choice"
     end
@@ -123,10 +127,11 @@ def clear_screen
   system("clear") || system("cls")
 end
 
+# main program
 clear_screen()
 prompt "welcome"
-
-loop do
+prompt "rules"
+loop do # main loop
   loop do
     choice = valid_choice
     computer_choice = ABBREVIATIONS.values.sample
