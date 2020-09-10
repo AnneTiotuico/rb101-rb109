@@ -1,0 +1,18 @@
+en:
+  welcome: "Welcome to Rock Paper Scissors Spock! First to 5 points wins. Let's play!"
+  choices: "Choose one: rock (r), paper (p), scissors (sc), lizard (l) or spock (sp)."
+  invalid_choice: "That's not a valid choice."
+  player_choice: "=> You chose: %{choice}."
+  computer_choice: "=> Computer chose: %{computer_choice}."
+  player_won: "You won this round!"
+  computer_won: "Computer won this round!"
+  tie: "It's a tie!"
+  display_score: |
+                  => ~~~~SCORE BOARD~~~~
+                  => You: %{player_score} | Computer: %{computer_score}
+  player_grand_winner: "You are the grand winner!"
+  computer_grand_winner: "The computer is the grand winner!"
+  invalid_continue: "Invalid response. Please enter 'y' or 'n'."
+  another_game: "Do you want to play another game? (y/n)"
+  again: "Who will win this time?"
+  goodbye: "Thank you for playing. Good bye!"
