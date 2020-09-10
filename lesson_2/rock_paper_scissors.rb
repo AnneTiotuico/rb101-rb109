@@ -19,6 +19,8 @@ VALID_CHOICES = { "rock" => ['scissors', 'lizard', 'sc', 'l'],
                   "l" => ['paper', 'spock', 'p', 'sp'],
                   "sp" => ['rock', 'scissors', 'r', 'sc'] }
 
+FINAL_SCORE = 5
+
 scores = { "player" => 0, "computer" => 0 }
 
 # methods
@@ -85,15 +87,15 @@ def display_score(scores)
 end
 
 def display_winner(scores)
-  if scores['player'] == 5
+  if scores['player'] == FINAL_SCORE
     prompt "player_grand_winner"
-  elsif scores ['computer'] == 5
+  elsif scores ['computer'] == FINAL_SCORE
     prompt "computer_grand_winner"
   end
 end
 
 def game_over(scores)
-  scores['player'] == 5 || scores['computer'] == 5
+  scores['player'] == FINAL_SCORE || scores['computer'] == FINAL_SCORE
 end
 
 def continue
