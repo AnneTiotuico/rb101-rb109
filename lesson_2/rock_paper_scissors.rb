@@ -72,7 +72,7 @@ def display_result(player, computer)
   end
 end
 
-def get_score(scores, player, computer)
+def update_score(scores, player, computer)
   if win?(player, computer)
     scores['player'] += 1
   elsif win?(computer, player)
@@ -141,7 +141,7 @@ loop do # main loop
     display_choices(choice, computer_choice)
 
     display_result(choice, computer_choice)
-    get_score(scores, choice, computer_choice)
+    update_score(scores, choice, computer_choice)
     display_score(scores)
     display_winner(scores)
     break if game_over(scores)
