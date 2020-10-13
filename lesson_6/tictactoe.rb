@@ -61,6 +61,10 @@ def computers_turn(board, marker)
   puts "Computer played. Your turn."
 end
 
+def board_full?(board)
+  board.values.all? {|marked| ['X', 'O'].include?(marked) }
+end
+
 #main game
 puts "Welcome! Let's play some tic tac toe!"
 board = initialize_board # blank board
@@ -73,9 +77,8 @@ loop do
   comp_marker = assign_comp_marker(player_marker)
   loop do
     players_turn(board, player_marker)
-    # break if winner? || board_full?
+    break if board_full?(board)
     computers_turn(board, comp_marker)
-
   end
   # if winner?
   #   "X wins!"
@@ -83,6 +86,7 @@ loop do
   #   "It's a tie"
   # end
   # break unless playagain?
+  break
 end
 
 puts "Goodbye, thanks for playing!"
