@@ -1,3 +1,4 @@
+require 'pry'
 def display_board(brd)
   puts ""
   puts "     |     |"
@@ -41,14 +42,16 @@ def assign_comp_marker(player_marker)
 end
 
 def players_turn(board, marker)
-  puts "Which box would you like to mark? (1-9)"
-  position = 0
+  position = ''
+  display_board(board)
   loop do
-    position = gets.chomp.to_i
-    break if board[position] == ' '
-    puts "Invalid box, please choose an empty box from 1-9."
+    puts "Which box would you like to mark? (1-9)"
+    position = gets.chomp
+    break if ('1'..'9').include?(position) && board[position.to_i] == ' '
+    display_board(board)
+    puts "Invalid box, please choose an empty box between 1-9."
   end
-  update_board(board, marker, position)
+  update_board(board, marker, position.to_i)
 end
 
 def computers_turn(board, marker)
@@ -58,35 +61,65 @@ def computers_turn(board, marker)
     break if board[position] == ' '
   end
   update_board(board, marker, position)
-  puts "Computer played. Your turn."
+  puts "Computer played box #{position}. Your turn."
 end
 
 def board_full?(board)
-  board.values.all? {|marked| ['X', 'O'].include?(marked) }
+  board.values.all? { |marked| ['X', 'O'].include?(marked) }
+end
+
+def three_in_a_row?(board)
+  win_row = [[1, 2, 3], [4,5,6], [7,8,9], [1, 4, 7],
+          [2, 5, 8], [3, 6, 9], [1, 5, 9], [3,5,7]]
+  win_row.map do |row|
+    return row if row.all? {|num| board[num] == 'X'}
+    return row if row.all? {|num| board[num] == 'O'}
+  end.any?
+  return false
+end
+
+def determine_winner(board, winning_row)
+  if winning_row
+    if board[winning_row[0]] == 'X'
+      puts "X wins!"
+    else
+      puts "O wins!"
+    end
+  else
+    puts "Tie!"
+  end
+end
+
+def play_again?(board)
+  answer = ''
+  loop do
+    puts "Do you want to play again? (y/n)"
+    answer = gets.chomp.downcase
+    break if ['y', 'n'].include?(answer)
+    puts "Invalid, please enter 'y' or 'n'."
+  end
+  answer == 'y' ? true : false
 end
 
 #main game
 puts "Welcome! Let's play some tic tac toe!"
-board = initialize_board # blank board
-display_board(board) # output board
+
 
 #main loop
 loop do
+  board = initialize_board # blank board
+  display_board(board) # output board
   #choose markers
   player_marker = choose_marker()
   comp_marker = assign_comp_marker(player_marker)
   loop do
+    break if three_in_a_row?(board)
     players_turn(board, player_marker)
     break if board_full?(board)
     computers_turn(board, comp_marker)
   end
-  # if winner?
-  #   "X wins!"
-  # else
-  #   "It's a tie"
-  # end
-  # break unless playagain?
-  break
+  determine_winner(board, three_in_a_row?(board))
+  break unless play_again?(board)
 end
 
 puts "Goodbye, thanks for playing!"
