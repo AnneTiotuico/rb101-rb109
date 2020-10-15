@@ -1,15 +1,15 @@
-require 'pry'
 def display_board(brd)
+  clear_screen()
   puts ""
-  puts "     |     |"
+  puts "1    |2    |3"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
   puts "     |     |"
   puts "-----+-----+-----"
-  puts "     |     |"
+  puts "4    |5    |6"
   puts "  #{brd[4]}  |  #{brd[5]}  |  #{brd[6]}"
   puts "     |     |"
   puts "-----+-----+-----"
-  puts "     |     |"
+  puts "7    |8    |9"
   puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}"
   puts "     |     |"
   puts ""
@@ -26,12 +26,13 @@ def update_board(board, marker, position)
   display_board(board)
 end
 
-def choose_marker
+def choose_marker(board)
   marker = ''
   loop do
     puts "Choose your marker: X or O"
     marker = gets.chomp.upcase
     break if ['X', 'O'].include?(marker)
+    display_board(board)
     puts "Please enter a valid marker."
   end
   marker
@@ -43,7 +44,6 @@ end
 
 def players_turn(board, marker)
   position = ''
-  display_board(board)
   loop do
     puts "Which box would you like to mark? (1-9)"
     position = gets.chomp
@@ -101,6 +101,10 @@ def play_again?(board)
   answer == 'y' ? true : false
 end
 
+def clear_screen
+  system("clear") || system("cls")
+end
+
 #main game
 puts "Welcome! Let's play some tic tac toe!"
 
@@ -110,12 +114,12 @@ loop do
   board = initialize_board # blank board
   display_board(board) # output board
   #choose markers
-  player_marker = choose_marker()
+  player_marker = choose_marker(board)
   comp_marker = assign_comp_marker(player_marker)
   loop do
     break if three_in_a_row?(board)
     players_turn(board, player_marker)
-    break if board_full?(board)
+    break if three_in_a_row?(board) || board_full?(board)
     computers_turn(board, comp_marker)
   end
   determine_winner(board, three_in_a_row?(board))
