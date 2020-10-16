@@ -1,6 +1,8 @@
 INITIAL_MARKER = ' '
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7],
                 [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]]
+FINAL_SCORE = 5
+scores = { "player" => 0, "computer" => 0 }
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -96,10 +98,23 @@ end
 
 def determine_winner(winner)
   if winner
-    prompt "#{winner} won!"
+    prompt "#{winner} won this round!"
   else
     prompt "It's a Tie!"
   end
+end
+
+def update_score(board, scores, player_marker, comp_marker)
+  winner = winner?(board, player_marker, comp_marker)
+  if winner == "Player"
+    scores['player'] += 1
+  elsif winner == "Computer"
+    scores['computer'] += 1
+  end
+end
+
+def display_score(scores)
+  prompt "Player: #{scores['player']} | Computer: #{scores['computer']}"
 end
 
 def play_again?
@@ -113,13 +128,30 @@ def play_again?
   answer == 'y'
 end
 
+def game_over?(scores)
+  scores['player'] == FINAL_SCORE || scores['computer'] == FINAL_SCORE
+end
+
+def display_game_winner(scores)
+  display_score(scores)
+  if scores['player'] == FINAL_SCORE
+    prompt "Congrats! You won the game!"
+  elsif scores['computer'] == FINAL_SCORE
+    prompt "The computer won this game."
+  end
+end
+
+def reset_score(scores)
+  scores['player'] = 0
+  scores['computer'] = 0
+end
+
 def clear_screen
   system("clear") || system("cls")
 end
 
 # main game
 prompt "Welcome! Let's play some tic tac toe!"
-# main loop
 loop do
   board = initialize_board # blank board
   display_board(board) # output board
@@ -127,13 +159,25 @@ loop do
   player_marker = choose_marker(board)
   comp_marker = assign_comp_marker(player_marker)
   loop do
-    break if winner?(board, player_marker, comp_marker)
-    players_turn(board, player_marker)
-    break if winner?(board, player_marker, comp_marker) || board_full?(board)
-    computers_turn(board, comp_marker)
+    board = initialize_board # blank board
+    display_board(board) # output board
+    display_score(scores)
+    loop do
+      break if winner?(board, player_marker, comp_marker)
+      players_turn(board, player_marker)
+      break if winner?(board, player_marker, comp_marker) || board_full?(board)
+      computers_turn(board, comp_marker)
+    end
+    update_score(board, scores, player_marker, comp_marker)
+    determine_winner(winner?(board, player_marker, comp_marker))
+    unless scores.has_value?(FINAL_SCORE)
+      prompt "Next round..."
+      sleep 2
+    end
+    break if game_over?(scores)
   end
-  determine_winner(winner?(board, player_marker, comp_marker))
-  break unless play_again?
+  display_game_winner(scores)
+  reset_score(scores)
+break unless play_again?
 end
-
 prompt "Goodbye, thanks for playing tic tac toe!"
