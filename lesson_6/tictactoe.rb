@@ -25,6 +25,14 @@ def display_board(brd)
 end
 # rubocop: enable Metrics/AbcSize
 
+def joinor(arr, delimiter= ', ', word='or')
+  if arr.length < 3
+    arr.join(" #{word} ")
+  else
+    arr.join(delimiter).insert(-2, "#{word} ")
+  end
+end
+
 def initialize_board
   new_board = {}
   (1..9).each { |num| new_board[num] = INITIAL_MARKER }
@@ -59,7 +67,7 @@ end
 def players_turn(board, marker)
   position = ''
   loop do
-    prompt "Choose a square. (#{empty_squares(board).join(', ')})"
+    prompt "Choose a square. (#{joinor(empty_squares(board))})"
     position = gets.chomp.to_i
     break if empty_squares(board).include?(position)
     display_board(board)
