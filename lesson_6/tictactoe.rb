@@ -66,16 +66,20 @@ def empty_squares(board)
   board.keys.select { |num| board[num] == INITIAL_MARKER }
 end
 
+def valid_integer?(num)
+  num.to_i.to_s == num
+end
+
 def players_turn(board, marker)
   position = ''
   loop do
     prompt "Choose a square. (#{joinor(empty_squares(board))})"
-    position = gets.chomp.to_i
-    break if empty_squares(board).include?(position)
+    position = gets.chomp
+    break if empty_squares(board).include?(position.to_i) && valid_integer?(position)
     display_board(board)
     prompt "Invalid square, please choose an empty square."
   end
-  update_board!(board, marker, position)
+  update_board!(board, marker, position.to_i)
 end
 
 def computers_turn(board, marker)
@@ -151,7 +155,7 @@ def clear_screen
 end
 
 # main game
-prompt "Welcome! Let's play some tic tac toe!"
+prompt "Welcome! Let's play some Tic Tac Toe!"
 loop do
   board = initialize_board # blank board
   display_board(board) # output board
@@ -180,4 +184,4 @@ loop do
   reset_score(scores)
 break unless play_again?
 end
-prompt "Goodbye, thanks for playing tic tac toe!"
+prompt "Goodbye, thanks for playing Tic Tac Toe!"
