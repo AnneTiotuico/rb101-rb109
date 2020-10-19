@@ -1,3 +1,4 @@
+require 'pry'
 INITIAL_MARKER = ' '
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7],
                 [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]]
@@ -70,7 +71,7 @@ def valid_integer?(num)
   num.to_i.to_s == num
 end
 
-def players_turn(board, marker)
+def players_turn(board, player_marker)
   position = ''
   loop do
     prompt "Choose a square. (#{joinor(empty_squares(board))})"
@@ -79,13 +80,32 @@ def players_turn(board, marker)
     display_board(board)
     prompt "Invalid square, please choose an empty square."
   end
-  update_board!(board, marker, position.to_i)
+  update_board!(board, player_marker, position.to_i)
 end
 
-def computers_turn(board, marker)
-  position = empty_squares(board).sample
-  update_board!(board, marker, position)
-  prompt "Computer (#{marker}) played square #{position}."
+def two_in_a_row(board, player_marker, comp_marker)
+  win_lines = WINNING_LINES.dup
+  win_lines.map do |row|
+    return row if row.count { |square| board[square] == player_marker } == 2 && at_risk_square?(board, row)
+  end
+  false
+end
+
+def at_risk_square?(board, row)
+  board.values_at(*row).include?(INITIAL_MARKER)
+end
+
+def computers_turn(board, comp_marker, player_marker)
+  position = ''
+  row = two_in_a_row(board, player_marker, comp_marker)
+  p row
+  if row
+    position = row.select { |square| square if board[square] == INITIAL_MARKER }[0]
+  else
+    position = empty_squares(board).sample # computer chooses random empty square
+  end
+  update_board!(board, comp_marker, position)
+  prompt "Computer (#{comp_marker}) played square #{position}."
 end
 
 def board_full?(board)
@@ -170,7 +190,7 @@ loop do
       break if winner?(board, player_marker, comp_marker)
       players_turn(board, player_marker)
       break if winner?(board, player_marker, comp_marker) || board_full?(board)
-      computers_turn(board, comp_marker)
+      computers_turn(board, comp_marker, player_marker)
     end
     update_score(board, scores, player_marker, comp_marker)
     determine_winner(winner?(board, player_marker, comp_marker))
