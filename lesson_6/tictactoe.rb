@@ -83,12 +83,14 @@ def players_turn(board, player_marker)
   update_board!(board, player_marker, position.to_i)
 end
 
-def two_in_a_row(board, player_marker, comp_marker)
+def two_in_a_row(board, marker)
   win_lines = WINNING_LINES.dup
   win_lines.map do |row|
-    return row if row.count { |square| board[square] == player_marker } == 2 && at_risk_square?(board, row)
+    if row.count { |square| board[square] == marker } == 2 && at_risk_square?(board, row)
+      return row.select { |square| square if board[square] == INITIAL_MARKER }[0]
+    end
   end
-  false
+    false
 end
 
 def at_risk_square?(board, row)
@@ -97,10 +99,12 @@ end
 
 def computers_turn(board, comp_marker, player_marker)
   position = ''
-  row = two_in_a_row(board, player_marker, comp_marker)
-  p row
-  if row
-    position = row.select { |square| square if board[square] == INITIAL_MARKER }[0]
+  if two_in_a_row(board, comp_marker)
+    position = two_in_a_row(board, comp_marker)
+  elsif two_in_a_row(board, player_marker)
+    position = two_in_a_row(board, player_marker)
+  elsif board[5] == INITIAL_MARKER
+    position = 5
   else
     position = empty_squares(board).sample # computer chooses random empty square
   end
