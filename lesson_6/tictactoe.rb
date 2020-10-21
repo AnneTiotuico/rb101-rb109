@@ -143,11 +143,7 @@ def place_piece(brd, current_player, player_marker, comp_marker, scores)
 end
 
 def alternate_player(current_player)
-  if current_player == "player"
-    "computer"
-  else
-    "player"
-  end
+  current_player == 'player' ? 'computer' : 'player'
 end
 
 def board_full?(brd)
@@ -162,7 +158,7 @@ def winner?(brd, player_marker, comp_marker)
   false
 end
 
-def determine_winner(winner)
+def display_round_winner(winner)
   if winner
     puts "#{winner} won this round!"
   else
@@ -252,7 +248,7 @@ loop do # game loop
     update_score!(board, scores, player_marker, comp_marker)
 
     unless scores.value?(FINAL_SCORE)
-      determine_winner(winner?(board, player_marker, comp_marker))
+      display_round_winner(winner?(board, player_marker, comp_marker))
       prompt "Next round..."
       sleep 3
     end
