@@ -72,18 +72,24 @@ def valid_integer?(num)
   num.to_i.to_s == num
 end
 
-def get_current_player(current_player)
-  if CURRENT_PLAYER == "player"
-    current_player = "player"
-  elsif CURRENT_PLAYER == "computer"
-    current_player = "computer"
-  elsif CURRENT_PLAYER == "choose"
-    prompt "Who goes first, player or computer?"
+def choose_current_player
+  current_player = ''
+  prompt "Who goes first, player or computer?"
     loop do
       current_player = gets.chomp.downcase
       break if ['player', 'computer'].include?(current_player)
       prompt "Please choose 'player' or 'computer' to go first."
     end
+  current_player
+end
+
+def set_current_player(current_player)
+  if CURRENT_PLAYER == "player"
+    current_player = "player"
+  elsif CURRENT_PLAYER == "computer"
+    current_player = "computer"
+  elsif CURRENT_PLAYER == "choose"
+    current_player = choose_current_player
   end
   current_player
 end
@@ -232,7 +238,7 @@ loop do # game loop
   player_marker = choose_marker(board, scores)
   comp_marker = assign_comp_marker(player_marker)
 
-  current_player = get_current_player(current_player) # who goes first
+  current_player = set_current_player(current_player) # who goes first
 
   loop do # reset board for new round
     board = initialize_board
