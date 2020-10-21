@@ -229,6 +229,7 @@ def display_goodbye
 end
 
 # main game
+clear_screen
 display_greeting
 sleep 5
 
