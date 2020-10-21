@@ -1,8 +1,8 @@
-require 'pry'
 INITIAL_MARKER = ' '
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7],
-                [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]]
+                 [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]]
 FINAL_SCORE = 5
+CURRENT_PLAYER = "choose"
 scores = { "player" => 0, "computer" => 0 }
 
 def prompt(msg)
@@ -10,9 +10,10 @@ def prompt(msg)
 end
 
 # rubocop: disable Metrics/AbcSize
-def display_board(brd)
+def display_board(brd, scores)
   clear_screen
   puts ""
+  puts "   TIC TAC TOE"
   puts "1    |2    |3"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
   puts "     |     |"
@@ -24,7 +25,7 @@ def display_board(brd)
   puts "7    |8    |9"
   puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}"
   puts "     |     |"
-  puts ""
+  display_score(scores)
 end
 # rubocop: enable Metrics/AbcSize
 
@@ -42,18 +43,18 @@ def initialize_board
   new_board
 end
 
-def update_board!(board, marker, position)
-  board[position] = marker
-  display_board(board)
+def update_board!(brd, marker, square, scores)
+  brd[square] = marker
+  display_board(brd, scores)
 end
 
-def choose_marker(board)
+def choose_marker(brd, scores)
   marker = ''
   loop do
     prompt "Choose your marker: X or O"
     marker = gets.chomp.upcase
     break if ['X', 'O'].include?(marker)
-    display_board(board)
+    display_board(brd, scores)
     prompt "Please enter a valid marker."
   end
   marker
@@ -63,77 +64,108 @@ def assign_comp_marker(player_marker)
   player_marker == 'X' ? 'O' : 'X'
 end
 
-def empty_squares(board)
-  board.keys.select { |num| board[num] == INITIAL_MARKER }
+def empty_squares(brd)
+  brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
 def valid_integer?(num)
   num.to_i.to_s == num
 end
 
-def players_turn(board, player_marker)
-  position = ''
-  loop do
-    prompt "Choose a square. (#{joinor(empty_squares(board))})"
-    position = gets.chomp
-    break if empty_squares(board).include?(position.to_i) && valid_integer?(position)
-    display_board(board)
-    prompt "Invalid square, please choose an empty square."
-  end
-  update_board!(board, player_marker, position.to_i)
-end
-
-def two_in_a_row(board, marker)
-  win_lines = WINNING_LINES.dup
-  win_lines.map do |row|
-    if row.count { |square| board[square] == marker } == 2 && at_risk_square?(board, row)
-      return row.select { |square| square if board[square] == INITIAL_MARKER }[0]
+def get_current_player(current_player)
+  if CURRENT_PLAYER == "player"
+    current_player = "player"
+  elsif CURRENT_PLAYER == "computer"
+    current_player = "computer"
+  elsif CURRENT_PLAYER == "choose"
+    prompt "Who goes first, player or computer?"
+    loop do
+      current_player = gets.chomp.downcase
+      break if ['player', 'computer'].include?(current_player)
+      prompt "Please choose 'player' or 'computer' to go first."
     end
   end
-    false
+  current_player
 end
 
-def at_risk_square?(board, row)
-  board.values_at(*row).include?(INITIAL_MARKER)
-end
-
-def computers_turn(board, comp_marker, player_marker)
-  position = ''
-  if two_in_a_row(board, comp_marker)
-    position = two_in_a_row(board, comp_marker)
-  elsif two_in_a_row(board, player_marker)
-    position = two_in_a_row(board, player_marker)
-  elsif board[5] == INITIAL_MARKER
-    position = 5
-  else
-    position = empty_squares(board).sample # computer chooses random empty square
+def players_turn(brd, player_marker, scores)
+  square = ''
+  loop do
+    prompt "Choose a square. (#{joinor(empty_squares(brd))})"
+    square = gets.chomp
+    break if empty_squares(brd).include?(square.to_i) && valid_integer?(square)
+    display_board(brd, scores)
+    prompt "Invalid square, please choose an empty square."
   end
-  update_board!(board, comp_marker, position)
-  prompt "Computer (#{comp_marker}) played square #{position}."
+  update_board!(brd, player_marker, square.to_i, scores)
 end
 
-def board_full?(board)
-  empty_squares(board).empty?
+def two_in_a_row(brd, marker)
+  win_lines = WINNING_LINES.dup
+  win_lines.map do |row|
+    if row.count { |square| brd[square] == marker } == 2 && at_risk?(brd, row)
+      return row.select { |square| square if brd[square] == INITIAL_MARKER }[0]
+    end
+  end
+  false
 end
 
-def winner?(board, player_marker, comp_marker)
+def at_risk?(brd, row)
+  brd.values_at(*row).include?(INITIAL_MARKER)
+end
+
+def computers_turn(brd, comp_marker, player_marker, scores)
+  square = if two_in_a_row(brd, comp_marker)
+             two_in_a_row(brd, comp_marker)
+           elsif two_in_a_row(brd, player_marker)
+             two_in_a_row(brd, player_marker)
+           elsif brd[5] == INITIAL_MARKER
+             5
+           else
+             empty_squares(brd).sample # computer chooses random empty square
+           end
+  update_board!(brd, comp_marker, square, scores)
+  puts "Computer (#{comp_marker}) played square #{square}."
+end
+
+def place_piece(brd, current_player, player_marker, comp_marker, scores)
+  if current_player == "player"
+    players_turn(brd, player_marker, scores)
+  else
+    computers_turn(brd, comp_marker, player_marker, scores)
+  end
+end
+
+def alternate_player(current_player)
+  if current_player == "player"
+    "computer"
+  else
+    "player"
+  end
+end
+
+def board_full?(brd)
+  empty_squares(brd).empty?
+end
+
+def winner?(brd, player_marker, comp_marker)
   WINNING_LINES.each do |row|
-    return "Player" if row.all? { |num| board[num] == player_marker }
-    return "Computer" if row.all? { |num| board[num] == comp_marker }
+    return "Player" if row.all? { |num| brd[num] == player_marker }
+    return "Computer" if row.all? { |num| brd[num] == comp_marker }
   end
   false
 end
 
 def determine_winner(winner)
   if winner
-    prompt "#{winner} won this round!"
+    puts "#{winner} won this round!"
   else
-    prompt "It's a Tie!"
+    puts "It's a Tie!"
   end
 end
 
-def update_score(board, scores, player_marker, comp_marker)
-  winner = winner?(board, player_marker, comp_marker)
+def update_score(brd, scores, player_marker, comp_marker)
+  winner = winner?(brd, player_marker, comp_marker)
   if winner == "Player"
     scores['player'] += 1
   elsif winner == "Computer"
@@ -142,7 +174,7 @@ def update_score(board, scores, player_marker, comp_marker)
 end
 
 def display_score(scores)
-  prompt "Player: #{scores['player']} | Computer: #{scores['computer']}"
+  puts "Player: #{scores['player']} | Computer: #{scores['computer']}"
 end
 
 def play_again?
@@ -161,12 +193,13 @@ def game_over?(scores)
 end
 
 def display_game_winner(scores)
-  display_score(scores)
   if scores['player'] == FINAL_SCORE
-    prompt "Congrats! You won the game!"
+    puts "Congrats! You won the game!"
   elsif scores['computer'] == FINAL_SCORE
-    prompt "The computer won this game."
+    puts "GAME OVER. The computer won this game."
   end
+  puts " ~~~~~FINAL SCORE~~~~~"
+  display_score(scores)
 end
 
 def reset_score(scores)
@@ -178,34 +211,50 @@ def clear_screen
   system("clear") || system("cls")
 end
 
+def display_greeting
+  prompt "Welcome! Let's play some Tic Tac Toe!"
+  prompt "Get 3 in a row to win a round! First to win 5 rounds wins the game!"
+  prompt "Game starting..."
+end
+
+def display_goodbye
+  prompt "Goodbye, thanks for playing Tic Tac Toe!"
+end
+
 # main game
-prompt "Welcome! Let's play some Tic Tac Toe!"
-loop do
-  board = initialize_board # blank board
-  display_board(board) # output board
-  # choose markers
-  player_marker = choose_marker(board)
+display_greeting
+sleep 5
+
+loop do # game loop
+  board = initialize_board
+  display_board(board, scores)
+
+  player_marker = choose_marker(board, scores)
   comp_marker = assign_comp_marker(player_marker)
-  loop do
-    board = initialize_board # blank board
-    display_board(board) # output board
-    display_score(scores)
-    loop do
-      break if winner?(board, player_marker, comp_marker)
-      players_turn(board, player_marker)
+
+  current_player = get_current_player(current_player) # who goes first
+
+  loop do # reset board for new round
+    board = initialize_board
+    display_board(board, scores)
+
+    loop do # round loop
+      place_piece(board, current_player, player_marker, comp_marker, scores)
+      current_player = alternate_player(current_player)
       break if winner?(board, player_marker, comp_marker) || board_full?(board)
-      computers_turn(board, comp_marker, player_marker)
     end
     update_score(board, scores, player_marker, comp_marker)
-    determine_winner(winner?(board, player_marker, comp_marker))
-    unless scores.has_value?(FINAL_SCORE)
+
+    unless scores.value?(FINAL_SCORE)
+      determine_winner(winner?(board, player_marker, comp_marker))
       prompt "Next round..."
-      sleep 2
+      sleep 3
     end
     break if game_over?(scores)
   end
   display_game_winner(scores)
   reset_score(scores)
-break unless play_again?
+  break unless play_again?
 end
-prompt "Goodbye, thanks for playing Tic Tac Toe!"
+
+display_goodbye
