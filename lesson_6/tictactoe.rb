@@ -179,6 +179,11 @@ def display_score(scores)
   puts "Player: #{scores['player']} | Computer: #{scores['computer']}"
 end
 
+def pause_for_next_round
+  prompt "Next round..."
+  sleep 3
+end
+
 def play_again?
   answer = ''
   loop do
@@ -249,8 +254,7 @@ loop do # game loop
 
     unless scores.value?(FINAL_SCORE)
       display_round_winner(winner?(board, player_marker, comp_marker))
-      prompt "Next round..."
-      sleep 3
+      pause_for_next_round
     end
     break if game_over?(scores)
   end
