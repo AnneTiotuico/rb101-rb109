@@ -122,7 +122,7 @@ def computers_turn(brd, comp_marker, player_marker, scores)
            elsif brd[5] == INITIAL_MARKER
              5
            else
-             empty_squares(brd).sample # computer chooses random empty square
+             empty_squares(brd).sample
            end
   update_board!(brd, comp_marker, square, scores)
   puts "Computer (#{comp_marker}) played square #{square}."
@@ -164,7 +164,7 @@ def determine_winner(winner)
   end
 end
 
-def update_score(brd, scores, player_marker, comp_marker)
+def update_score!(brd, scores, player_marker, comp_marker)
   winner = winner?(brd, player_marker, comp_marker)
   if winner == "Player"
     scores['player'] += 1
@@ -202,7 +202,7 @@ def display_game_winner(scores)
   display_score(scores)
 end
 
-def reset_score(scores)
+def reset_score!(scores)
   scores['player'] = 0
   scores['computer'] = 0
 end
@@ -243,7 +243,7 @@ loop do # game loop
       current_player = alternate_player(current_player)
       break if winner?(board, player_marker, comp_marker) || board_full?(board)
     end
-    update_score(board, scores, player_marker, comp_marker)
+    update_score!(board, scores, player_marker, comp_marker)
 
     unless scores.value?(FINAL_SCORE)
       determine_winner(winner?(board, player_marker, comp_marker))
@@ -253,7 +253,7 @@ loop do # game loop
     break if game_over?(scores)
   end
   display_game_winner(scores)
-  reset_score(scores)
+  reset_score!(scores)
   break unless play_again?
 end
 
