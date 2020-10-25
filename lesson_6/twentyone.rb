@@ -2,6 +2,10 @@ CARD_VALUES = ('2'..'10').to_a.append('J','Q','K','A')
 SUITS = ['D', 'C', 'H', 'S']
 DECK = SUITS.product(CARD_VALUES)
 
+def prompt(msg)
+  puts "=> #{msg}"
+end
+
 def deal_cards(deck, num_cards=2)
   cards = deck.sample(num_cards)
   update_deck(deck, cards)
@@ -14,14 +18,14 @@ def update_deck(deck, cards)
 end
 
 def display_dealt_cards(dealer_cards, player_cards)
-  puts "Dealer's hand: [#{dealer_cards[0]}, ? ]"
-  puts "Your hand: #{player_cards}"
+  prompt "Dealer's hand: [#{dealer_cards[0]}, ? ]"
+  prompt "Your hand: #{player_cards}"
   display_total(player_cards)
 end
 
 def display_total(player_cards)
   total = calculate_cards_total(player_cards)
-  puts "Your total: #{total}"
+  prompt "Your total: #{total}"
 end
 
 def calculate_cards_total(cards)
@@ -51,30 +55,63 @@ end
 def player_turn(player_cards, deck, dealer_cards)
   answer = ''
   loop do
-    puts "hit or stay?"
+    prompt "hit or stay?"
     answer = gets.chomp
     break if answer == "stay" || busted?(player_cards)
     clear_screen
-    puts "You chose to hit!"
+    prompt "You chose to hit!"
     player_cards << (deal_cards(deck, 1).flatten)
     display_dealt_cards(dealer_cards, player_cards)
     break if answer == "stay" || busted?(player_cards)
   end
-
+  clear_screen
   if busted?(player_cards)
-    puts "Dealer won!"
+    prompt "You busted! Dealer won!"
   else
-    puts "You chose to stay!"
+    prompt "You chose to stay!"
   end
-
 end
 
-# def dealer_turn(cards)
-#   loop do
-#     break if hand_total >= 17 || bust?
-#     prompt "Dealer hit"
-#   end
-# end
+def dealer_turn(dealer_cards, deck)
+  prompt "Dealer's turn!"
+  loop do
+    hand_total = calculate_cards_total(dealer_cards)
+    break if hand_total >= 17 || busted?(dealer_cards)
+    prompt "Dealer hit"
+    dealer_cards << (deal_cards(deck, 1).flatten)
+  end
+  if busted?(dealer_cards)
+    prompt "Dealer busted! You win!"
+  else
+    prompt "Dealer chose to stay."
+  end
+end
+
+def display_final_totals(dealer_cards, player_cards)
+  dealer_total = calculate_cards_total(dealer_cards)
+  player_total = calculate_cards_total(player_cards)
+  prompt "Dealer Total: #{dealer_total}  Your Total: #{player_total}"
+end
+
+def determine_winner(dealer_cards, player_cards)
+  dealer_total = calculate_cards_total(dealer_cards)
+  player_total = calculate_cards_total(player_cards)
+  if dealer_total < 22 && dealer_total > player_total
+    "dealer"
+  elsif player_total < 22 && player_total > dealer_total
+    "player"
+  else
+    "tie"
+  end
+end
+
+def display_final_results(winner)
+  case winner
+  when'dealer' then "Dealer wins!"
+  when 'player' then "You win!"
+  when 'tie' then "It's a tie!"
+  end
+end
 
 def clear_screen
   system("clear") || system("cls")
@@ -88,6 +125,17 @@ loop do
   player_cards = deal_cards(deck)
   dealer_cards = deal_cards(deck)
   display_dealt_cards(dealer_cards, player_cards)
-  player_turn(player_cards, deck, dealer_cards)
+  loop do
+    player_turn(player_cards, deck, dealer_cards)
+    break if busted?(player_cards)
+    dealer_turn(dealer_cards, deck)
+    break
+  end
+  display_final_totals(dealer_cards, player_cards)
+  break if busted?(player_cards) || busted?(dealer_cards)
+  winner = determine_winner(dealer_cards, player_cards)
+  prompt display_final_results(winner)
   break
 end
+
+puts "Thanks for playing Twenty One!"
