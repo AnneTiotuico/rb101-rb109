@@ -1,4 +1,4 @@
-CARD_VALUES = ('2'..'10').to_a.append('J','Q','K','A')
+CARD_VALUES = ('2'..'10').to_a.append('J', 'Q', 'K', 'A')
 SUITS = ['D', 'C', 'H', 'S']
 DECK = SUITS.product(CARD_VALUES)
 
@@ -32,9 +32,19 @@ def display_initial_cards(dealer_cards, player_cards)
   prompt "Your hand: #{player_cards} for a total of: #{total}"
 end
 
-def new_hand(player, cards)
+def hit(player, deck, cards)
+  if player == "Your"
+    prompt "You chose to hit!"
+  elsif player == "Dealer's"
+    prompt "Dealer chose to hit!"
+  end
+  cards << (deal_cards(deck, 1).flatten)
+  display_new_hand(player, cards)
+end
+
+def display_new_hand(player, cards)
   total = calculate_total(cards)
-  prompt "#{player} cards are: #{cards}, for a total of #{total}"
+  prompt "#{player} hand: #{cards}, for a total of #{total}"
 end
 
 def calculate_total(cards)
@@ -42,13 +52,13 @@ def calculate_total(cards)
   sum = 0
 
   values.each do |value|
-    if value == "A"
-      sum += 11
-    elsif value.to_i == 0 # J, Q, K
-      sum += 10
-    else
-      sum += value.to_i
-    end
+    sum += if value == "A"
+             11
+           elsif value.to_i == 0 # J, Q, K
+             10
+           else
+             value.to_i
+           end
   end
   # correct for Aces
   values.select { |value| value == "A" }.count.times do
@@ -59,6 +69,18 @@ end
 
 def busted?(cards)
   calculate_total(cards) > 21
+end
+
+def busted_or_stayed(player, dealer_cards, player_cards)
+  if busted?(player_cards) || busted?(dealer_cards)
+    determine_result(dealer_cards, player_cards)
+  elsif player == 'player'
+    prompt "You stayed at #{calculate_total(player_cards)}."
+  elsif player == 'dealer'
+    prompt "Dealer chose to stay at #{calculate_total(dealer_cards)}."
+    display_new_hand("Your", player_cards)
+    display_new_hand("Dealer's", dealer_cards)
+  end
 end
 
 def player_turn(player_cards, deck, dealer_cards)
@@ -72,41 +94,20 @@ def player_turn(player_cards, deck, dealer_cards)
     end
     clear_screen
     if answer == 'h' || answer == 'hit'
-      prompt "You chose to hit!"
-      player_cards << (deal_cards(deck, 1).flatten)
-      new_hand("Your", player_cards)
+      hit("Your", deck, player_cards)
     end
     break if answer == "stay" || answer == 's' || busted?(player_cards)
   end
-  if busted?(player_cards)
-    determine_result(dealer_cards, player_cards)
-  else
-    prompt "You stayed at #{calculate_total(player_cards)}."
-  end
+  busted_or_stayed('player', dealer_cards, player_cards)
 end
 
 def dealer_turn(dealer_cards, deck, player_cards)
   prompt "Dealer's turn..."
   loop do
     break if calculate_total(dealer_cards) >= 17 || busted?(dealer_cards)
-    prompt "Dealer hit!"
-    dealer_cards << (deal_cards(deck, 1).flatten)
-    new_hand("Dealer's", dealer_cards)
+    hit("Dealer's", deck, dealer_cards)
   end
-
-  if busted?(dealer_cards)
-    determine_result(dealer_cards, player_cards)
-  else
-    prompt "Dealer chose to stay at #{calculate_total(dealer_cards)}."
-    display_final_cards(dealer_cards, player_cards)
-  end
-end
-
-def display_final_cards(dealer_cards, player_cards)
-  dealer_total = calculate_total(dealer_cards)
-  player_total = calculate_total(player_cards)
-  prompt "Dealer has #{dealer_cards}, for a total of: #{dealer_total}"
-  prompt "Player has #{player_cards}, for a total of: #{player_total}"
+  busted_or_stayed('dealer', dealer_cards, player_cards)
 end
 
 def determine_result(dealer_cards, player_cards)
@@ -150,7 +151,6 @@ end
 def clear_screen
   system("clear") || system("cls")
 end
-
 
 # main game
 
