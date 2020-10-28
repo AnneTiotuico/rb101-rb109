@@ -2,9 +2,9 @@ CARD_VALUES = ('2'..'10').to_a.append('J', 'Q', 'K', 'A')
 SUITS = ['D', 'C', 'H', 'S']
 DECK = SUITS.product(CARD_VALUES)
 FINAL_SCORE = 5
-GAME_NAME = "Fifty-One"
-DEALER_STAY = 47
-WINNING_HAND = 51
+GAME_NAME = "Twenty-One"
+DEALER_STAY = 17
+WINNING_HAND = 21
 scores = { "player" => 0, "dealer" => 0 }
 
 def prompt(msg)
@@ -12,7 +12,7 @@ def prompt(msg)
 end
 
 def display_welcome
-  puts ""
+  puts "================================================================"
   prompt "Welcome to #{GAME_NAME}! Get as close to #{WINNING_HAND} " \
          "without going over."
   prompt "(Suits - D: Diamonds, C: Clubs, H: Hearts, S: Spades)"
@@ -22,6 +22,7 @@ def display_welcome
   prompt "Player with total closest to #{WINNING_HAND} wins the round, " \
          "any totals over #{WINNING_HAND} busts."
   prompt "First player to score 5 wins, wins the game!"
+  puts "================================================================"
   enter_to_continue
 end
 
@@ -31,22 +32,22 @@ end
 
 def deal_cards(deck, num_cards=2)
   cards = deck.sample(num_cards)
-  update_deck(deck, cards)
+  update_deck!(deck, cards)
   cards
 end
 
-def update_deck(deck, cards)
+def update_deck!(deck, cards)
   deck.delete_if { |card| cards.include?(card) }
   deck
 end
 
 def display_initial_cards(dealer_cards, player_cards, player_total)
-  clear_screen
   prompt "Dealer's hand: [#{dealer_cards[0]}, ? ]"
   prompt "Your hand: #{player_cards} for a total of: #{player_total}"
 end
 
 def hit(player, deck, cards)
+  clear_screen
   if player == "Your"
     prompt "You chose to hit!"
   elsif player == "Dealer's"
@@ -85,6 +86,7 @@ end
 
 def busted_or_stayed(player, dealer_total, player_total)
   return if busted?(player_total) || busted?(dealer_total)
+  clear_screen
   if player == 'player'
     prompt "You stayed at #{player_total}."
   elsif player == 'dealer'
@@ -115,11 +117,13 @@ end
 
 def dealer_turn(dealer_cards, deck, dealer_total, player_total)
   prompt "Dealer's turn..."
+  sleep 2
   loop do
     break if dealer_total >= DEALER_STAY || busted?(dealer_total)
     hit("Dealer's", deck, dealer_cards)
     dealer_total = calculate_total(dealer_cards)
     display_new_hand("Dealer's", dealer_cards, dealer_total)
+    sleep 2.5
   end
   busted_or_stayed('dealer', dealer_total, player_total)
 end
@@ -194,6 +198,11 @@ def enter_to_continue
   end
 end
 
+def display_round(round)
+  clear_screen
+  prompt "~~~~~ Round: #{round} ~~~~~"
+end
+
 def game_over?(scores)
   scores['player'] == FINAL_SCORE || scores['dealer'] == FINAL_SCORE
 end
@@ -201,9 +210,9 @@ end
 def display_game_winner(scores)
   puts "======================================"
   if scores['player'] == FINAL_SCORE
-    puts "Congrats! You won the game!"
+    prompt "Congrats! You won the game!"
   elsif scores['dealer'] == FINAL_SCORE
-    puts "GAME OVER. The dealer won this game."
+    prompt "GAME OVER. The dealer won this game."
   end
   puts " ~~~~~FINAL SCORE~~~~~"
   display_scoreboard(scores)
@@ -225,12 +234,14 @@ display_welcome
 
 loop do # game loop
   deck = initialize_deck # new deck
+  round = 1
   loop do # round loop
     deck = initialize_deck if deck.length < 10
     player_cards = deal_cards(deck)
     dealer_cards = deal_cards(deck)
     dealer_total = calculate_total(dealer_cards)
     player_total = calculate_total(player_cards)
+    display_round(round)
     display_initial_cards(dealer_cards, player_cards, player_total)
 
     loop do
@@ -242,6 +253,8 @@ loop do # game loop
       break
     end
     update_scoreboard!(scores, dealer_total, player_total)
+    round += 1
+
     unless scores.value?(FINAL_SCORE)
       display_winner(player_cards, player_total, dealer_cards, dealer_total)
       display_scoreboard(scores)
