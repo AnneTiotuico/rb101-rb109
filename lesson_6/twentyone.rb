@@ -73,7 +73,10 @@ def calculate_total(cards)
              value.to_i
            end
   end
-  # correct for Aces
+  sum = correct_for_aces(values, sum)
+end
+
+def correct_for_aces(values, sum)
   values.select { |value| value == "A" }.count.times do
     sum -= 10 if sum > WINNING_HAND
   end
